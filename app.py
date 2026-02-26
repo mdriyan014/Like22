@@ -280,12 +280,14 @@ def handle_requests():
 
     if tokens_for_like_sending:
         print(f"Using token batch for {server_name_param} (size {len(tokens_for_like_sending)}) to send likes.")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            loop.run_until_complete(send_likes_with_token_batch(uid_param, server_name_param, like_api_url, tokens_for_like_sending))
-        finally:
-            loop.close()
+        asyncio.run(
+    send_likes_with_token_batch(
+        uid_param,
+        server_name_param,
+        like_api_url,
+        tokens_for_like_sending
+    )
+        )
     else:
         print(f"Skipping like sending for UID {uid_param} as no tokens available for like sending.")
         
