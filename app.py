@@ -125,21 +125,24 @@ async def send_like(enc_like_hex, token):
 # ===================== API =====================
 @app.route("/like", methods=["GET"])
 def like_api():
+
     uid = request.args.get("uid")
+
     if not uid or not uid.isdigit():
         return jsonify({"status": 0, "error": "Invalid UID"}), 400
 
     tokens = load_tokens()
 
-if not tokens:
-    return jsonify({"error": "Token file problem"}), 500
+    if not tokens:
+        return jsonify({"error": "Token file problem"}), 500
 
-token = tokens[0].get("token")
+    token = tokens[0].get("token")
 
-if not token:
-    return jsonify({"error": "Invalid token format"}), 500
+    if not token:
+        return jsonify({"error": "Invalid token format"}), 500
 
     enc = enc_uid(uid)
+
     if not enc:
         return jsonify({"status": 0, "error": "UID encryption failed"}), 500
 
