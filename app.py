@@ -18,13 +18,25 @@ BD_PROFILE_URL = "https://clientbp.ggblueshark.com/GetPlayerPersonalShow"
 BD_LIKE_URL    = "https://clientbp.ggblueshark.com/LikeProfile"
 
 # ===================== TOKEN LOADER =====================
-def load_bd_tokens():
+def load_tokens():
     try:
         with open("token_bd.json", "r") as f:
-            tokens = json.load(f)
-        return tokens
+            data = json.load(f)
+
+        # Ensure it's a list
+        if isinstance(data, list) and len(data) > 0:
+            # Ensure first item has token key
+            if "token" in data[0]:
+                return data
+            else:
+                print("❌ 'token' key missing in JSON objects")
+                return None
+        else:
+            print("❌ JSON is not a valid token list")
+            return None
+
     except Exception as e:
-        app.logger.error(f"Token load error: {e}")
+        print("❌ Token load error:", e)
         return None
 
 # ===================== ENCRYPT =====================
@@ -117,13 +129,15 @@ def like_api():
     if not uid or not uid.isdigit():
         return jsonify({"status": 0, "error": "Invalid UID"}), 400
 
-    tokens = load_bd_tokens()
-    if not tokens:
-        return jsonify({"status": 0, "error": "Token load failed"}), 500
+    tokens = load_tokens()
 
-    token = tokens[0].get("token")
-    if not token:
-        return jsonify({"status": 0, "error": "Invalid token format"}), 500
+if not tokens:
+    return jsonify({"error": "Token file problem"}), 500
+
+token = tokens[0].get("token")
+
+if not token:
+    return jsonify({"error": "Invalid token format"}), 500
 
     enc = enc_uid(uid)
     if not enc:
